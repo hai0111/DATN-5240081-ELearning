@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleCreated = (doc: { type: 'file'; file: File } | { type: 'text'; name: string }) => {
     const newDoc = addDoc(doc);
-    router.push(`/dashboard/doc/${newDoc.id}`);
+    router.push(`/doc/${newDoc.id}`);
   };
 
   return (
@@ -55,7 +55,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Nav */}
         <nav className="space-y-0.5 px-2">
           {NAV_ITEMS.map(({ icon: Icon, label, id }) => {
-            const href = `/dashboard/${id}`;
+    const href = `/${id}`;
             const active = pathname === href;
             return (
               <Link
@@ -89,7 +89,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <div className="flex-1 space-y-0.5 overflow-y-auto px-2 pb-2">
           {docs.slice(0, 10).map((doc) => {
-            const href = `/dashboard/doc/${doc.id}`;
+            const href = `/doc/${doc.id}`;
             const active = pathname === href;
             return (
               <Link
