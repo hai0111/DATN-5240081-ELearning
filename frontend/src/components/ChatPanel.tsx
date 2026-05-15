@@ -1,17 +1,22 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Bot, ChevronLeft, Maximize2, Plus, Send, X } from "lucide-react";
 import { chatService, type ChatMessage, type ConversationItem } from "@/lib/services/chat.service";
 
 interface Props {
   docId: number | null;
-  onClose: () => void;
-  expanded: boolean;
-  onToggleExpand: () => void;
+  onClose?: () => void;
+  fullPage?: boolean;
+  defaultView?: "chat" | "history";
+  // legacy props kept for panel mode
+  expanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
-export default function ChatPanel({ docId, onClose, expanded, onToggleExpand }: Props) {
-  const [view, setView] = useState<"history" | "chat">("chat");
+export default function ChatPanel({ docId, onClose, fullPage, defaultView, expanded, onToggleExpand }: Props) {
+  const router = useRouter();
+  const [view, setView] = useState<"history" | "chat">(defaultView ?? "chat");
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [activeConvId, setActiveConvId] = useState<number | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -82,8 +87,16 @@ export default function ChatPanel({ docId, onClose, expanded, onToggleExpand }: 
     }
   };
 
+  const handleExpand = () => {
+    if (view === "history") {
+      router.push("/chat/histories");
+    } else {
+      router.push(docId != null ? `/chat/${docId}` : "/chat/histories");
+    }
+  };
+
   return (
-    <div className={`border-border bg-background flex h-full flex-shrink-0 flex-col border-l transition-all ${expanded ? "w-[480px]" : "w-80"}`}>
+    <div className={`border-border bg-background flex flex-shrink-0 flex-col border-l transition-all ${fullPage ? "h-full w-full border-l-0" : expanded ? "h-full w-[480px]" : "h-full w-80"}`}>
       {/* Header */}
       <div className="border-border flex h-10 items-center justify-between border-b px-3">
         <div className="flex items-center gap-2 text-sm font-medium">
@@ -104,15 +117,17 @@ export default function ChatPanel({ docId, onClose, expanded, onToggleExpand }: 
             {view === "history" ? "Chat" : "Lịch sử"}
           </button>
           <button
-            onClick={onToggleExpand}
+            onClick={handleExpand}
             className="text-muted-foreground hover:text-foreground rounded p-1"
-            title={expanded ? "Thu nhỏ" : "Mở rộng"}
+            title="Mở rộng"
           >
             <Maximize2 className="h-3.5 w-3.5" />
           </button>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground rounded p-1">
-            <X className="h-3.5 w-3.5" />
-          </button>
+          {!fullPage && onClose && (
+            <button onClick={onClose} className="text-muted-foreground hover:text-foreground rounded p-1">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
