@@ -1,0 +1,19 @@
+# ===== FRONTEND (Next.js) =====
+frontend/node_modules/
+frontend/.next/
+frontend/.env*
+frontend/out/
+
+# ===== BACKEND (.NET) =====
+backend/bin/
+backend/obj/
+backend/Uploads/
+backend/*.user
+backend/*.lscache
+backend/appsettings*.json
+
+# ===== ROOT =====
+node_modules/
+package-lock.json
+*.pdf
+chapter3.txt
