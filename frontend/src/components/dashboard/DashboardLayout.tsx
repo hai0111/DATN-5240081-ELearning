@@ -7,6 +7,8 @@ import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
 import { NAV_ITEMS } from '@/lib/constants';
 import { useDocuments } from '@/hooks/useDocuments';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import NewDocModal from '@/components/NewDocModal';
 import ProfileModal from '@/components/ProfileModal';
 
@@ -41,13 +43,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Search */}
         <div className="px-2 py-2">
-          <div className="bg-muted/50 text-muted-foreground flex h-7 items-center gap-2 rounded-md px-2 text-sm">
-            <Search className="h-3.5 w-3.5 flex-shrink-0" />
-            <input
+          <div className="relative">
+            <Search className="text-muted-foreground absolute top-1/2 left-2 h-3.5 w-3.5 -translate-y-1/2" />
+            <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Tìm kiếm..."
-              className="placeholder:text-muted-foreground flex-1 bg-transparent outline-none"
+              className="h-7 pl-7 text-sm"
             />
           </div>
         </div>
@@ -79,12 +81,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <p className="text-muted-foreground mb-1 px-2 text-[10px] font-semibold tracking-wider uppercase">
             Tài liệu
           </p>
-          <button
-            onClick={() => setNewDocOpen(true)}
-            className="text-muted-foreground hover:bg-accent/50 hover:text-foreground flex h-7 w-full items-center gap-2 rounded-md px-2 text-sm transition-colors"
-          >
+          <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-muted-foreground"
+            onClick={() => setNewDocOpen(true)}>
             <Plus className="h-3.5 w-3.5" /> Thêm mới
-          </button>
+          </Button>
         </div>
 
         <div className="flex-1 space-y-0.5 overflow-y-auto px-2 pb-2">
@@ -110,19 +110,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* User footer */}
         <div className="border-border border-t p-2">
-          <div className="hover:bg-accent/50 flex h-8 items-center gap-2 rounded-md px-2 transition-colors">
-            <button
-              onClick={() => setProfileOpen(true)}
-              className="flex min-w-0 flex-1 items-center gap-2"
-            >
+          <div className="flex h-8 items-center gap-1">
+            <Button variant="ghost" size="sm" className="min-w-0 flex-1 justify-start gap-2 px-2"
+              onClick={() => setProfileOpen(true)}>
               <div className="bg-muted flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full">
                 <User className="text-muted-foreground h-3 w-3" />
               </div>
               <span className="truncate text-sm">{user?.fullName ?? 'Người dùng'}</span>
-            </button>
-            <button onClick={toggle} className="text-muted-foreground hover:text-foreground flex-shrink-0">
+            </Button>
+            <Button variant="ghost" size="icon-sm" onClick={toggle}>
               {theme === 'dark' ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
-            </button>
+            </Button>
           </div>
         </div>
       </aside>

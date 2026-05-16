@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Bot, Plus, FileText, File } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { NAV_LABELS, fileIconColor, type NavId } from '@/lib/constants';
+import { Button } from '@/components/ui/button';
 import NewDocModal from '@/components/NewDocModal';
 import ChatPanel from '@/components/ChatPanel';
 
@@ -38,18 +39,16 @@ export default function NavPage({ params }: { params: Promise<{ nav: string }> }
             <span className="text-foreground font-medium">{NAV_LABELS[nav as NavId]}</span>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant={chatOpen ? 'default' : 'outline'}
+              size="sm"
               onClick={() => setChatOpen((v) => !v)}
-              className={`flex h-7 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-opacity hover:opacity-90 ${chatOpen ? 'bg-foreground text-background' : 'border-border text-foreground border'}`}
             >
               <Bot className="h-3.5 w-3.5" /> AI Chat
-            </button>
-            <button
-              onClick={() => setNewDocOpen(true)}
-              className="bg-foreground text-background flex h-7 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-opacity hover:opacity-90"
-            >
+            </Button>
+            <Button size="sm" onClick={() => setNewDocOpen(true)}>
               <Plus className="h-3.5 w-3.5" /> Thêm mới
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -88,7 +87,7 @@ export default function NavPage({ params }: { params: Promise<{ nav: string }> }
                 </Link>
               ))}
 
-              <button
+                <button
                 onClick={() => setNewDocOpen(true)}
                 className="border-border hover:border-foreground/30 hover:bg-muted/30 text-muted-foreground flex h-[88px] flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-3 transition-all"
               >

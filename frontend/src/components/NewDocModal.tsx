@@ -1,6 +1,9 @@
 'use client';
 import { useState, useRef } from 'react';
-import { FileText, Upload, X, File } from 'lucide-react';
+import { FileText, Upload, File } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 type DocType = 'file' | 'text' | null;
 
@@ -16,18 +19,9 @@ export default function NewDocModal({ open, onClose, onCreated }: Props) {
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  if (!open) return null;
+  const reset = () => { setStep(null); setTextName(''); onClose(); };
 
-  const reset = () => {
-    setStep(null);
-    setTextName('');
-    onClose();
-  };
-
-  const handleFile = (file: File) => {
-    onCreated({ type: 'file', file });
-    reset();
-  };
+  const handleFile = (file: File) => { onCreated({ type: 'file', file }); reset(); };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -37,28 +31,14 @@ export default function NewDocModal({ open, onClose, onCreated }: Props) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-      onClick={reset}
-    >
-      <div
-        className="bg-card border-border w-full max-w-md rounded-xl border p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold">
-            {step === null
-              ? 'Thêm tài liệu mới'
-              : step === 'file'
-                ? 'Tải lên tệp tin'
-                : 'Tạo văn bản'}
-          </h2>
-          <button onClick={reset} className="text-muted-foreground hover:text-foreground">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={(o) => !o && reset()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {step === null ? 'Thêm tài liệu mới' : step === 'file' ? 'Tải lên tệp tin' : 'Tạo văn bản'}
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Step 1: chọn loại */}
         {step === null && (
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -73,7 +53,6 @@ export default function NewDocModal({ open, onClose, onCreated }: Props) {
                 <p className="text-muted-foreground mt-0.5 text-sm">PDF, DOCX, TXT</p>
               </div>
             </button>
-
             <button
               onClick={() => setStep('text')}
               className="border-border hover:border-foreground/30 hover:bg-muted/50 flex flex-col items-center gap-3 rounded-lg border p-5 transition-colors"
@@ -89,21 +68,15 @@ export default function NewDocModal({ open, onClose, onCreated }: Props) {
           </div>
         )}
 
-        {/* Step 2a: upload file */}
         {step === 'file' && (
           <div>
             <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragOver(true);
-              }}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileRef.current?.click()}
               className={`flex cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed p-10 transition-colors ${
-                dragOver
-                  ? 'border-foreground bg-muted/50'
-                  : 'border-border hover:border-foreground/40 hover:bg-muted/30'
+                dragOver ? 'border-foreground bg-muted/50' : 'border-border hover:border-foreground/40 hover:bg-muted/30'
               }`}
             >
               <File className="text-muted-foreground h-8 w-8" />
@@ -112,66 +85,38 @@ export default function NewDocModal({ open, onClose, onCreated }: Props) {
                 <p className="text-muted-foreground mt-1 text-sm">PDF, DOCX, TXT — tối đa 20MB</p>
               </div>
             </div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".pdf,.docx,.txt"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleFile(f);
-              }}
-            />
-            <button
-              onClick={() => setStep(null)}
-              className="text-muted-foreground hover:text-foreground mt-3 text-sm"
-            >
+            <input ref={fileRef} type="file" accept=".pdf,.docx,.txt" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+            <Button variant="ghost" size="sm" onClick={() => setStep(null)} className="mt-3">
               ← Quay lại
-            </button>
+            </Button>
           </div>
         )}
 
-        {/* Step 2b: đặt tên văn bản */}
         {step === 'text' && (
           <div className="space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-medium">Tên tài liệu</label>
-              <input
+              <Input
                 autoFocus
-                type="text"
                 value={textName}
                 onChange={(e) => setTextName(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && textName.trim()) {
-                    onCreated({ type: 'text', name: textName.trim() });
-                    reset();
-                  }
+                  if (e.key === 'Enter' && textName.trim()) { onCreated({ type: 'text', name: textName.trim() }); reset(); }
                 }}
                 placeholder="Nhập tên tài liệu..."
-                className="border-input bg-background placeholder:text-muted-foreground focus:ring-ring h-9 w-full rounded-md border px-3 text-sm focus:ring-2 focus:outline-none"
               />
             </div>
             <div className="flex gap-2">
-              <button
-                onClick={() => setStep(null)}
-                className="border-border hover:bg-muted h-9 flex-1 rounded-md border text-sm transition-colors"
-              >
-                Quay lại
-              </button>
-              <button
-                disabled={!textName.trim()}
-                onClick={() => {
-                  onCreated({ type: 'text', name: textName.trim() });
-                  reset();
-                }}
-                className="bg-foreground text-background h-9 flex-1 rounded-md text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-40"
-              >
+              <Button variant="outline" className="flex-1" onClick={() => setStep(null)}>Quay lại</Button>
+              <Button className="flex-1" disabled={!textName.trim()}
+                onClick={() => { onCreated({ type: 'text', name: textName.trim() }); reset(); }}>
                 Tạo
-              </button>
+              </Button>
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

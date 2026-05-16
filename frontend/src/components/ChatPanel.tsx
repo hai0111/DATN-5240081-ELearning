@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bot, ChevronLeft, Maximize2, Plus, Send, X } from "lucide-react";
 import { chatService, type ChatMessage, type ConversationItem } from "@/lib/services/chat.service";
+import { useDocuments } from "@/hooks/useDocuments";
+import { Button } from "@/components/ui/button";
 
 interface DocOption {
   docId: number;
@@ -10,7 +12,6 @@ interface DocOption {
 }
 
 interface Props {
-  docs?: DocOption[];
   onClose?: () => void;
   fullPage?: boolean;
   defaultView?: "chat" | "history";
@@ -21,8 +22,10 @@ interface Props {
 const MIN_WIDTH = 280;
 const MAX_WIDTH = 720;
 
-export default function ChatPanel({ docs = [], onClose, fullPage, defaultView }: Props) {
+export default function ChatPanel({ onClose, fullPage, defaultView }: Props) {
   const router = useRouter();
+  const { docs: rawDocs } = useDocuments();
+  const docs: DocOption[] = rawDocs.map((d) => ({ docId: Number(d.id), title: d.name }));
   const [view, setView] = useState<"history" | "chat">(defaultView ?? "chat");
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [activeConvId, setActiveConvId] = useState<number | null>(null);
@@ -196,39 +199,34 @@ export default function ChatPanel({ docs = [], onClose, fullPage, defaultView }:
       <div className="border-border flex h-10 flex-shrink-0 items-center justify-between border-b px-3">
         <div className="flex items-center gap-2 text-sm font-medium">
           {view === "history" && (
-            <button onClick={() => setView("chat")} className="text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="icon-xs" onClick={() => setView("chat")}>
               <ChevronLeft className="h-4 w-4" />
-            </button>
+            </Button>
           )}
           <Bot className="h-4 w-4" />
           {view === "history" ? "Lịch sử chat" : "AI Chat"}
         </div>
         <div className="flex items-center gap-1">
-          <button
-            onClick={() => setView(view === "history" ? "chat" : "history")}
-            className="text-muted-foreground hover:text-foreground rounded px-1.5 py-1 text-[11px]"
-          >
+          <Button variant="ghost" size="xs"
+            onClick={() => setView(view === "history" ? "chat" : "history")}>
             {view === "history" ? "Chat" : "Lịch sử"}
-          </button>
-          <button onClick={handleExpand} className="text-muted-foreground hover:text-foreground rounded p-1">
+          </Button>
+          <Button variant="ghost" size="icon-xs" onClick={handleExpand} title="Mở rộng">
             <Maximize2 className="h-3.5 w-3.5" />
-          </button>
+          </Button>
           {!fullPage && onClose && (
-            <button onClick={onClose} className="text-muted-foreground hover:text-foreground rounded p-1">
+            <Button variant="ghost" size="icon-xs" onClick={onClose}>
               <X className="h-3.5 w-3.5" />
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
       {view === "history" ? (
         <div className="flex-1 overflow-y-auto">
-          <button
-            onClick={newChat}
-            className="border-border text-muted-foreground hover:bg-muted/50 flex w-full items-center gap-2 border-b px-3 py-2.5 text-sm"
-          >
+          <Button variant="ghost" size="xs" onClick={newChat} className="w-full justify-start gap-2 border-b rounded-none px-3 py-2.5 h-auto">
             <Plus className="h-3.5 w-3.5" /> Chat mới
-          </button>
+          </Button>
           {conversations.length === 0 && (
             <p className="text-muted-foreground p-4 text-center text-xs">Chưa có lịch sử chat</p>
           )}
@@ -286,9 +284,9 @@ export default function ChatPanel({ docs = [], onClose, fullPage, defaultView }:
                 {mentionedDocs.map((d) => (
                   <span key={d.docId} className="bg-muted text-foreground flex items-center gap-1 rounded px-2 py-0.5 text-xs">
                     @{d.title}
-                    <button onClick={() => removeMention(d.docId)} className="text-muted-foreground hover:text-foreground">
+                    <Button variant="ghost" size="icon-xs" onClick={() => removeMention(d.docId)}>
                       <X className="h-3 w-3" />
-                    </button>
+                    </Button>
                   </span>
                 ))}
               </div>
@@ -324,13 +322,11 @@ export default function ChatPanel({ docs = [], onClose, fullPage, defaultView }:
                 className="placeholder:text-muted-foreground flex-1 resize-none bg-transparent text-sm outline-none disabled:opacity-50"
                 style={{ maxHeight: 120, overflowY: "auto" }}
               />
-              <button
-                onClick={send}
+              <Button variant="ghost" size="icon-sm" onClick={send}
                 disabled={!input.trim() || streaming}
-                className="text-muted-foreground hover:text-foreground disabled:opacity-30 flex-shrink-0 pb-0.5"
-              >
+                className="flex-shrink-0 pb-0.5">
                 <Send className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
             <p className="text-muted-foreground mt-1.5 text-[10px]">Enter gửi · Shift+Enter xuống dòng · @ chọn tài liệu</p>
           </div>

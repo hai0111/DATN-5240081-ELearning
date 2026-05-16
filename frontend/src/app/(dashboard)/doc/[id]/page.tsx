@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { Bot, File, FileText, MoreHorizontal } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { fileIconColor } from '@/lib/constants';
+import { Button } from '@/components/ui/button';
 import ChatPanel from '@/components/ChatPanel';
 
 export default function DocPage({ params }: { params: Promise<{ id: string }> }) {
@@ -25,12 +26,13 @@ export default function DocPage({ params }: { params: Promise<{ id: string }> })
             <span>/</span>
             <span className="text-foreground font-medium truncate max-w-xs">{doc.name}</span>
           </div>
-          <button
+          <Button
+            variant={chatOpen ? 'default' : 'outline'}
+            size="sm"
             onClick={() => setChatOpen((v) => !v)}
-            className={`flex h-7 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-opacity hover:opacity-90 ${chatOpen ? 'bg-foreground text-background' : 'border border-border text-foreground'}`}
           >
             <Bot className="h-3.5 w-3.5" /> AI Chat
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -50,9 +52,9 @@ export default function DocPage({ params }: { params: Promise<{ id: string }> })
                   </p>
                 </div>
               </div>
-              <button className="text-muted-foreground hover:text-foreground p-1">
+              <Button variant="ghost" size="icon-sm" className="text-muted-foreground">
                 <MoreHorizontal className="h-5 w-5" />
-              </button>
+              </Button>
             </div>
 
             {doc.type === 'text' ? (
@@ -64,9 +66,7 @@ export default function DocPage({ params }: { params: Promise<{ id: string }> })
               <div className="border-border text-muted-foreground flex flex-col items-center gap-3 rounded-lg border p-8">
                 <File className="h-12 w-12" />
                 <p className="text-sm">Xem trước tệp {doc.fileType}</p>
-                <button className="bg-foreground text-background h-8 rounded-md px-4 text-sm font-medium hover:opacity-90">
-                  Mở tệp
-                </button>
+                <Button size="sm">Mở tệp</Button>
               </div>
             )}
           </div>
@@ -75,7 +75,6 @@ export default function DocPage({ params }: { params: Promise<{ id: string }> })
 
       {chatOpen && (
         <ChatPanel
-          docs={[{ docId: Number(doc.id), title: doc.name }]}
           onClose={() => setChatOpen(false)}
           expanded={chatExpanded}
           onToggleExpand={() => setChatExpanded((v) => !v)}
