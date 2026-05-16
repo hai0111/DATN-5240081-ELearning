@@ -16,7 +16,7 @@ export default function DocPage({ params }: { params: Promise<{ id: string }> })
   const [chatExpanded, setChatExpanded] = useState(false);
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="relative flex h-full overflow-hidden">
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
         <div className="border-border flex h-12 flex-shrink-0 items-center justify-between border-b px-6">
@@ -75,7 +75,7 @@ export default function DocPage({ params }: { params: Promise<{ id: string }> })
 
       {chatOpen && (
         <ChatPanel
-          docId={Number(doc.id)}
+          docs={[{ docId: Number(doc.id), title: doc.name }]}
           onClose={() => setChatOpen(false)}
           expanded={chatExpanded}
           onToggleExpand={() => setChatExpanded((v) => !v)}

@@ -208,8 +208,11 @@ public class ChatController(
         Response.Headers.Append("Content-Type", "text/event-stream");
         Response.Headers.Append("Cache-Control", "no-cache");
 
+        // Vector search chỉ trên các doc được mention
         var queryVector = await ai.GetEmbeddingAsync(req.Question);
-        var results = vectorStore.Search(queryVector, topK: 3);
+        var results = req.DocIds.Length > 0
+            ? vectorStore.SearchByDocs(queryVector, req.DocIds, topK: 5)
+            : [];
         var context = string.Join("\n\n", results.Select(r => r.Text));
 
         Conversation conv;
@@ -219,11 +222,19 @@ public class ChatController(
         }
         else
         {
-            conv = new Conversation { DocId = req.DocId, UserId = CurrentUserId };
+            conv = new Conversation { UserId = CurrentUserId, Title = req.Question[..Math.Min(60, req.Question.Length)] };
             db.Conversations.Add(conv);
         }
-        db.Messages.Add(new Message { Conversation = conv, SenderType = "User", Content = req.Question });
+
+        var userMsg = new Message { Conversation = conv, SenderType = "User", Content = req.Question };
+        foreach (var docId in req.DocIds)
+            userMsg.DocRefs.Add(new MessageDocRef { DocId = docId });
+        db.Messages.Add(userMsg);
         await db.SaveChangesAsync();
+
+        // Send convId as first SSE event so client can track it
+        await Response.WriteAsync($"event: conv\ndata: {conv.ConvId}\n\n", ct);
+        await Response.Body.FlushAsync(ct);
 
         var fullResponse = new System.Text.StringBuilder();
         await foreach (var chunk in ai.StreamChatAsync(req.Question, context).WithCancellation(ct))
@@ -242,10 +253,9 @@ public class ChatController(
     {
         var convs = await db.Conversations
             .Where(c => c.UserId == CurrentUserId)
-            .Include(c => c.Document)
             .OrderByDescending(c => c.StartTime)
             .Select(c => new ConversationDto(
-                c.ConvId, c.DocId, c.Document.Title,
+                c.ConvId, c.Title,
                 c.Messages.OrderByDescending(m => m.SentAt).Select(m => m.Content).FirstOrDefault() ?? "",
                 c.StartTime))
             .ToListAsync();
@@ -257,22 +267,11 @@ public class ChatController(
     {
         var messages = await db.Messages
             .Where(m => m.ConvId == convId && m.Conversation.UserId == CurrentUserId)
+            .Include(m => m.DocRefs)
             .OrderBy(m => m.SentAt)
-            .Select(m => new ChatMessage(m.SenderType, m.Content, m.SentAt))
-            .ToListAsync();
-        return Ok(messages);
-    }
-
-    [HttpGet("history/{docId}")]
-    public async Task<IActionResult> GetHistory(int docId)
-    {
-        var messages = await db.Conversations
-            .Where(c => c.DocId == docId && c.UserId == CurrentUserId)
-            .OrderByDescending(c => c.StartTime)
-            .Take(1)
-            .SelectMany(c => c.Messages)
-            .OrderBy(m => m.SentAt)
-            .Select(m => new ChatMessage(m.SenderType, m.Content, m.SentAt))
+            .Select(m => new ChatMessage(
+                m.SenderType, m.Content, m.SentAt,
+                m.DocRefs.Select(r => r.DocId).ToArray()))
             .ToListAsync();
         return Ok(messages);
     }

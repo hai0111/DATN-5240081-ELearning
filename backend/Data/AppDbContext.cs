@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<DocumentTag> DocumentTags => Set<DocumentTag>();
     public DbSet<Conversation> Conversations => Set<Conversation>();
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<MessageDocRef> MessageDocRefs => Set<MessageDocRef>();
     public DbSet<SharedLink> SharedLinks => Set<SharedLink>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +38,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Document>()
             .HasOne(d => d.User).WithMany(u => u.Documents).HasForeignKey(d => d.UserId).OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<MessageDocRef>().HasKey(r => new { r.MessageId, r.DocId });
+
         modelBuilder.Entity<Conversation>()
             .HasOne(c => c.User).WithMany(u => u.Conversations).HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.NoAction);
         modelBuilder.Entity<Conversation>()
@@ -49,6 +52,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Conversation).WithMany(c => c.Messages).HasForeignKey(m => m.ConvId).OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<MessageDocRef>()
+            .HasOne(r => r.Message).WithMany(m => m.DocRefs).HasForeignKey(r => r.MessageId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<MessageDocRef>()
+            .HasOne(r => r.Document).WithMany(d => d.MessageDocRefs).HasForeignKey(r => r.DocId).OnDelete(DeleteBehavior.NoAction);
 
         // Seed roles
         modelBuilder.Entity<Role>().HasData(

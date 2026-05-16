@@ -25,6 +25,16 @@ public class VectorStoreService
             .ToList();
     }
 
+    public List<(int DocId, string Text, double Score)> SearchByDocs(float[] queryVector, int[] docIds, int topK = 5)
+    {
+        return _store
+            .Where(e => docIds.Contains(e.DocId))
+            .Select(e => (e.DocId, e.Text, Score: CosineSimilarity(queryVector, e.Vector)))
+            .OrderByDescending(x => x.Score)
+            .Take(topK)
+            .ToList();
+    }
+
     private static double CosineSimilarity(float[] a, float[] b)
     {
         double dot = 0, magA = 0, magB = 0;

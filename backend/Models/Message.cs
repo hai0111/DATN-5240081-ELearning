@@ -9,4 +9,5 @@ public class Message
     public DateTime SentAt { get; set; } = DateTime.UtcNow;
 
     public Conversation Conversation { get; set; } = null!;
+    public ICollection<MessageDocRef> DocRefs { get; set; } = [];
 }

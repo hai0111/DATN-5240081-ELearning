@@ -17,5 +17,6 @@ public class Document
     public Category? Category { get; set; }
     public ICollection<DocumentTag> DocumentTags { get; set; } = [];
     public ICollection<Conversation> Conversations { get; set; } = [];
+    public ICollection<MessageDocRef> MessageDocRefs { get; set; } = [];
     public ICollection<SharedLink> SharedLinks { get; set; } = [];
 }

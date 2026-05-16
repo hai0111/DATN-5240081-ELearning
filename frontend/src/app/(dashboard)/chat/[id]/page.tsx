@@ -1,13 +1,11 @@
 'use client';
-import { use } from 'react';
 import ChatPanel from '@/components/ChatPanel';
 
-export default function ChatPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-
+// /chat/[id] now opens a new chat (id is unused, kept for routing compat)
+export default function ChatPage() {
   return (
     <div className="flex h-screen flex-col">
-      <ChatPanel docId={Number(id)} fullPage />
+      <ChatPanel fullPage defaultView="chat" />
     </div>
   );
 }
