@@ -1,14 +1,16 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @layer base {
-  button { cursor: pointer; }
+  button {
+    cursor: pointer;
+  }
 }
 
 @font-face {
-  font-family: "Google Sans Flex";
-  src: url("/fonts/GoogleSansFlex.ttf") format("truetype");
+  font-family: 'Google Sans Flex';
+  src: url('/fonts/GoogleSansFlex.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -138,7 +140,7 @@
     font-size: 16px;
   }
   html {
-    font-family: "Google Sans Flex", ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Google Sans Flex', ui-sans-serif, system-ui, sans-serif;
     font-size: 16px;
   }
 }
@@ -162,12 +164,12 @@
 
 .tiptap table th {
   background-color: hsl(var(--muted));
-  font-weight: 600;
+  font-weight: normal;
   text-align: left;
 }
 
 .tiptap table .selectedCell {
-  outline: 2px solid hsl(var(--primary));
+  background-color: #eee;
   outline-offset: -1px;
 }
 
