@@ -145,6 +145,17 @@
   }
 }
 
+/* Tiptap */
+.tiptap a {
+  color: oklch(0.55 0.2 250);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dark .tiptap a {
+  color: oklch(0.7 0.2 250);
+}
+
 /* Tiptap Table */
 .tiptap table {
   border-collapse: collapse;
@@ -169,7 +180,7 @@
 }
 
 .tiptap table .selectedCell {
-  background-color: #eee;
+  background-color: var(--muted);
   outline-offset: -1px;
 }
 

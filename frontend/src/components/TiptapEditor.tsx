@@ -180,6 +180,26 @@ export default function TiptapEditor() {
   });
 
   const editorRef = useRef<HTMLDivElement>(null);
+  const tableToolbarRef = useRef<HTMLDivElement>(null);
+  const [tableToolbarPos, setTableToolbarPos] = useState<{ top: number; left: number } | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!s.table || !editorRef.current) {
+      setTableToolbarPos(null);
+      return;
+    }
+    const table = editorRef.current.querySelector('table');
+    if (!table) return;
+    const wrapperRect = editorRef.current.getBoundingClientRect();
+    const tableRect = table.getBoundingClientRect();
+    const toolbarHeight = tableToolbarRef.current?.offsetHeight ?? 40;
+    setTableToolbarPos({
+      top: tableRect.top - wrapperRect.top - toolbarHeight - 6,
+      left: tableRect.left - wrapperRect.left,
+    });
+  }, [s.table]);
 
   // Drag-to-select table cells via CellSelection
   useEffect(() => {
@@ -443,192 +463,199 @@ export default function TiptapEditor() {
         </DropdownMenu>
       </div>
 
-      {/* Table toolbar - hiện khi cursor trong table */}
-      {s.table && (
-        <div className="bg-popover border-border flex flex-wrap items-center gap-0.5 rounded-md border p-1 shadow-md">
-          <ToolbarButton
-            onClick={() => editor.chain().focus().addColumnBefore().run()}
-            title="Thêm cột bên trái"
+      <div ref={editorRef} className="relative">
+        {tableToolbarPos && (
+          <div
+            ref={tableToolbarRef}
+            className="bg-popover border-border absolute z-10 flex flex-wrap items-center gap-0.5 rounded-md border p-1 shadow-md"
+            style={{ top: tableToolbarPos.top, left: tableToolbarPos.left }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <ToolbarButton
+              onClick={() => editor.chain().focus().addColumnBefore().run()}
+              title="Thêm cột bên trái"
             >
-              <rect x="14" y="3" width="7" height="18" rx="1" />
-              <path d="M10 12H3" />
-              <path d="M6.5 8.5 3 12l3.5 3.5" />
-            </svg>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor.chain().focus().addColumnAfter().run()}
-            title="Thêm cột bên phải"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="14" y="3" width="7" height="18" rx="1" />
+                <path d="M10 12H3" />
+                <path d="M6.5 8.5 3 12l3.5 3.5" />
+              </svg>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().addColumnAfter().run()}
+              title="Thêm cột bên phải"
             >
-              <rect x="3" y="3" width="7" height="18" rx="1" />
-              <path d="M14 12h7" />
-              <path d="M17.5 8.5 21 12l-3.5 3.5" />
-            </svg>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor.chain().focus().deleteColumn().run()}
-            title="Xóa cột"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="7" height="18" rx="1" />
+                <path d="M14 12h7" />
+                <path d="M17.5 8.5 21 12l-3.5 3.5" />
+              </svg>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().deleteColumn().run()}
+              title="Xóa cột"
             >
-              <rect x="3" y="3" width="7" height="18" rx="1" />
-              <path d="m14 8 4 4-4 4" />
-              <path d="m18 8-4 4 4 4" />
-            </svg>
-          </ToolbarButton>
-          <Divider />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().addRowBefore().run()}
-            title="Thêm hàng phía trên"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="7" height="18" rx="1" />
+                <path d="m14 8 4 4-4 4" />
+                <path d="m18 8-4 4 4 4" />
+              </svg>
+            </ToolbarButton>
+            <Divider />
+            <ToolbarButton
+              onClick={() => editor.chain().focus().addRowBefore().run()}
+              title="Thêm hàng phía trên"
             >
-              <rect x="3" y="14" width="18" height="7" rx="1" />
-              <path d="M12 10V3" />
-              <path d="M8.5 6.5 12 3l3.5 3.5" />
-            </svg>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor.chain().focus().addRowAfter().run()}
-            title="Thêm hàng phía dưới"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="14" width="18" height="7" rx="1" />
+                <path d="M12 10V3" />
+                <path d="M8.5 6.5 12 3l3.5 3.5" />
+              </svg>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().addRowAfter().run()}
+              title="Thêm hàng phía dưới"
             >
-              <rect x="3" y="3" width="18" height="7" rx="1" />
-              <path d="M12 14v7" />
-              <path d="M8.5 17.5 12 21l3.5-3.5" />
-            </svg>
-          </ToolbarButton>
-          <ToolbarButton onClick={() => editor.chain().focus().deleteRow().run()} title="Xóa hàng">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="7" rx="1" />
+                <path d="M12 14v7" />
+                <path d="M8.5 17.5 12 21l3.5-3.5" />
+              </svg>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().deleteRow().run()}
+              title="Xóa hàng"
             >
-              <rect x="3" y="3" width="18" height="7" rx="1" />
-              <path d="m14 14 4 4-4 4" />
-              <path d="m18 14-4 4 4 4" />
-            </svg>
-          </ToolbarButton>
-          <Divider />
-          <ToolbarButton onClick={() => editor.chain().focus().mergeCells().run()} title="Gộp ô">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="7" rx="1" />
+                <path d="m14 14 4 4-4 4" />
+                <path d="m18 14-4 4 4 4" />
+              </svg>
+            </ToolbarButton>
+            <Divider />
+            <ToolbarButton onClick={() => editor.chain().focus().mergeCells().run()} title="Gộp ô">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="1" />
+                <path d="M9 3v18" />
+                <path d="m12 9-3 3 3 3" />
+                <path d="m15 9 3 3-3 3" />
+              </svg>
+            </ToolbarButton>
+            <ToolbarButton onClick={() => editor.chain().focus().splitCell().run()} title="Tách ô">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="1" />
+                <path d="M12 3v18" />
+                <path d="m9 9-3 3 3 3" />
+                <path d="m15 9 3 3-3 3" />
+              </svg>
+            </ToolbarButton>
+            <Divider />
+            <ToolbarButton
+              onClick={() => editor.chain().focus().deleteTable().run()}
+              title="Xóa bảng"
             >
-              <rect x="3" y="3" width="18" height="18" rx="1" />
-              <path d="M9 3v18" />
-              <path d="m12 9-3 3 3 3" />
-              <path d="m15 9 3 3-3 3" />
-            </svg>
-          </ToolbarButton>
-          <ToolbarButton onClick={() => editor.chain().focus().splitCell().run()} title="Tách ô">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="1" />
-              <path d="M12 3v18" />
-              <path d="m9 9-3 3 3 3" />
-              <path d="m15 9 3 3-3 3" />
-            </svg>
-          </ToolbarButton>
-          <Divider />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().deleteTable().run()}
-            title="Xóa bảng"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-destructive"
-            >
-              <path d="M3 6h18" />
-              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-              <line x1="10" x2="10" y1="11" y2="17" />
-              <line x1="14" x2="14" y1="11" y2="17" />
-            </svg>
-          </ToolbarButton>
-        </div>
-      )}
-
-      <EditorContent editor={editor} />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-destructive"
+              >
+                <path d="M3 6h18" />
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                <line x1="10" x2="10" y1="11" y2="17" />
+                <line x1="14" x2="14" y1="11" y2="17" />
+              </svg>
+            </ToolbarButton>
+          </div>
+        )}
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }
