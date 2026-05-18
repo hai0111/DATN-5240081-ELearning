@@ -138,6 +138,15 @@ export default function TiptapEditor() {
         class:
           'tiptap min-h-[400px] w-full text-sm leading-7 outline-none [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:my-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:my-2.5 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:my-2 [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:my-1.5',
       },
+      handleDOMEvents: {
+        dragstart: (_view, event) => {
+          if ((event.target as Element)?.closest?.('td, th')) {
+            event.preventDefault();
+            return true;
+          }
+          return false;
+        },
+      },
     },
   })!;
 
