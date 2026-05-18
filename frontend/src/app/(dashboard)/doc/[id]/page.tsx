@@ -6,6 +6,7 @@ import { useDocuments } from '@/hooks/useDocuments';
 import { fileIconColor } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import ChatPanel from '@/components/ChatPanel';
+import TiptapEditor from '@/components/TiptapEditor';
 
 export default function DocPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -58,10 +59,7 @@ export default function DocPage({ params }: { params: Promise<{ id: string }> })
             </div>
 
             {doc.type === 'text' ? (
-              <textarea
-                placeholder="Bắt đầu viết nội dung..."
-                className="placeholder:text-muted-foreground/50 min-h-[400px] w-full resize-none bg-transparent text-sm leading-7 outline-none"
-              />
+              <TiptapEditor />
             ) : (
               <div className="border-border text-muted-foreground flex flex-col items-center gap-3 rounded-lg border p-8">
                 <File className="h-12 w-12" />
